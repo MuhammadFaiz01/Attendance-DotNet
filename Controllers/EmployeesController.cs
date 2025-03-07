@@ -1,12 +1,14 @@
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using AttendanceApp.Data;
 using AttendanceApp.Models;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace AttendanceApp.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize] // Pastikan user sudah login & punya token JWT
     public class EmployeesController : ControllerBase
     {
         private readonly AppDbContext _context;
@@ -16,46 +18,34 @@ namespace AttendanceApp.Controllers
             _context = context;
         }
 
-        // GET: api/Employees
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Employee>>> GetEmployees()
+        public async Task<ActionResult<IEnumerable<Employee>>> GetAll()
         {
             return await _context.Employees.ToListAsync();
         }
 
-        // GET: api/Employees/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Employee>> GetEmployee(int id)
+        public async Task<ActionResult<Employee>> Get(int id)
         {
-            var employee = await _context.Employees.FindAsync(id);
-            if (employee == null)
-            {
-                return NotFound();
-            }
-            return employee;
+            var emp = await _context.Employees.FindAsync(id);
+            if (emp == null) return NotFound();
+            return emp;
         }
 
-        // POST: api/Employees
         [HttpPost]
-        public async Task<ActionResult<Employee>> CreateEmployee(Employee employee)
+        public async Task<ActionResult<Employee>> Create(Employee employee)
         {
             _context.Employees.Add(employee);
             await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetEmployee), new { id = employee.EmployeeId }, employee);
+            return CreatedAtAction(nameof(Get), new { id = employee.EmployeeId }, employee);
         }
 
-        // PUT: api/Employees/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateEmployee(int id, Employee updatedEmployee)
+        public async Task<IActionResult> Update(int id, Employee updated)
         {
-            if (id != updatedEmployee.EmployeeId)
-            {
-                return BadRequest();
-            }
+            if (id != updated.EmployeeId) return BadRequest();
 
-            // Melacak perubahan data
-            _context.Entry(updatedEmployee).State = EntityState.Modified;
-
+            _context.Entry(updated).State = EntityState.Modified;
             try
             {
                 await _context.SaveChangesAsync();
@@ -63,31 +53,19 @@ namespace AttendanceApp.Controllers
             catch (DbUpdateConcurrencyException)
             {
                 if (!_context.Employees.Any(e => e.EmployeeId == id))
-                {
                     return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                throw;
             }
-
             return NoContent();
         }
 
-        // DELETE: api/Employees/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteEmployee(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var employee = await _context.Employees.FindAsync(id);
-            if (employee == null)
-            {
-                return NotFound();
-            }
-
-            _context.Employees.Remove(employee);
+            var emp = await _context.Employees.FindAsync(id);
+            if (emp == null) return NotFound();
+            _context.Employees.Remove(emp);
             await _context.SaveChangesAsync();
-
             return NoContent();
         }
     }

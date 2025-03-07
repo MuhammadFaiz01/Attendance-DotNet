@@ -1,43 +1,93 @@
+using AttendanceApp.Data;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using AttendanceApp.Data;                   // Sesuaikan dengan namespace Anda
-using Microsoft.OpenApi.Models;             // Untuk OpenAPI info
-using Microsoft.Extensions.DependencyInjection; // Pastikan untuk AddSwaggerGen
-using Microsoft.AspNetCore.Builder;         // Pastikan untuk UseSwagger/UseSwaggerUI
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. Registrasi EF Core InMemory
+// 1. Konfigurasi DbContext (PostgreSQL)
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseInMemoryDatabase("AttendanceDb"));
+{
+    var connString = builder.Configuration.GetConnectionString("DefaultConnection");
+    options.UseNpgsql(connString);
+});
 
-// 2. Aktifkan controller-based API
+// 2. Tambahkan Identity (User, Role) + EF Store
+builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+    .AddEntityFrameworkStores<AppDbContext>()
+    .AddDefaultTokenProviders();
+
+// 3. JWT Authentication Setup
+var secretKey = builder.Configuration["JwtSettings:SecretKey"];
+var key = Encoding.ASCII.GetBytes(secretKey ?? "fallback_secret_key"); // jaga-jaga bila null
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme; 
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;    
+})
+.AddJwtBearer(options =>
+{
+    options.RequireHttpsMetadata = false;
+    options.SaveToken = true;
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = false,            // Sesuaikan sesuai kebutuhan
+        ValidateAudience = false,          // Sesuaikan sesuai kebutuhan
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(key)
+    };
+});
+
+// 4. Tambah Controller
 builder.Services.AddControllers();
 
-// 3. Aktifkan (opsional) Swagger (OpenAPI)
+// 5. Tambah Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Attendance API", Version = "v1" });
+
+    // Opsi: Tambahkan definisi Bearer di Swagger
+    var securitySchema = new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Description = "JWT Authorization header menggunakan Bearer scheme.",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer"
+    };
+    c.AddSecurityDefinition("Bearer", securitySchema);
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            securitySchema,
+            new string[] {}
+        }
+    });
 });
 
-// Build app
 var app = builder.Build();
 
-// 4. Gunakan Swagger (OpenAPI) jika environment Development
+// 6. Swagger & Middleware
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();        // Mem-serve swagger.json
-    app.UseSwaggerUI(c =>    // Mem-serve Swagger UI
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Attendance API v1");
-    });
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
-// 5. Middleware opsional
 app.UseHttpsRedirection();
 
-// 6. Map ke Controller
+// 7. Authentication & Authorization
+app.UseAuthentication();
+app.UseAuthorization();
+
+// 8. Map Controllers
 app.MapControllers();
 
-// 7. Jalankan
+// 9. Jalankan
 app.Run();

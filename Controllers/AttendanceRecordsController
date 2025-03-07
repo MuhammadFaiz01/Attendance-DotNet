@@ -1,12 +1,14 @@
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using AttendanceApp.Data;
 using AttendanceApp.Models;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace AttendanceApp.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize] // Gunakan JWT token
     public class AttendanceRecordsController : ControllerBase
     {
         private readonly AppDbContext _context;
@@ -16,75 +18,52 @@ namespace AttendanceApp.Controllers
             _context = context;
         }
 
-        // GET: api/AttendanceRecords
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<AttendanceRecord>>> GetAttendanceRecords()
+        public async Task<ActionResult<IEnumerable<AttendanceRecord>>> GetAll()
         {
-            // Include Employee untuk melihat data karyawan 
             return await _context.AttendanceRecords
-                                 .Include(a => a.Employee)
-                                 .ToListAsync();
+                .Include(r => r.Employee)
+                .ToListAsync();
         }
 
-        // GET: api/AttendanceRecords/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<AttendanceRecord>> GetAttendanceRecord(int id)
+        public async Task<ActionResult<AttendanceRecord>> Get(int id)
         {
             var record = await _context.AttendanceRecords
-                                       .Include(a => a.Employee)
-                                       .FirstOrDefaultAsync(a => a.AttendanceRecordId == id);
+                .Include(r => r.Employee)
+                .FirstOrDefaultAsync(r => r.AttendanceRecordId == id);
 
-            if (record == null)
-            {
-                return NotFound();
-            }
-
+            if (record == null) return NotFound();
             return record;
         }
 
-        // POST: api/AttendanceRecords
         [HttpPost]
-        public async Task<ActionResult<AttendanceRecord>> CreateAttendanceRecord(AttendanceRecord attendanceRecord)
+        public async Task<ActionResult<AttendanceRecord>> Create(AttendanceRecord record)
         {
-            attendanceRecord.CheckInTime = DateTime.UtcNow; // contoh set CheckInTime otomatis
-            _context.AttendanceRecords.Add(attendanceRecord);
+            record.CheckInTime = DateTime.UtcNow;
+            _context.AttendanceRecords.Add(record);
             await _context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetAttendanceRecord), 
-                new { id = attendanceRecord.AttendanceRecordId }, 
-                attendanceRecord);
+            return CreatedAtAction(nameof(Get), new { id = record.AttendanceRecordId }, record);
         }
 
-        // PUT: api/AttendanceRecords/5
-        // Misalnya digunakan untuk menambahkan CheckOutTime
         [HttpPut("{id}/checkout")]
-        public async Task<IActionResult> UpdateCheckOutTime(int id)
+        public async Task<IActionResult> CheckOut(int id)
         {
             var record = await _context.AttendanceRecords.FindAsync(id);
-            if (record == null)
-            {
-                return NotFound();
-            }
+            if (record == null) return NotFound();
 
             record.CheckOutTime = DateTime.UtcNow;
             await _context.SaveChangesAsync();
-
             return NoContent();
         }
 
-        // DELETE: api/AttendanceRecords/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteAttendanceRecord(int id)
+        public async Task<IActionResult> Delete(int id)
         {
             var record = await _context.AttendanceRecords.FindAsync(id);
-            if (record == null)
-            {
-                return NotFound();
-            }
-
+            if (record == null) return NotFound();
             _context.AttendanceRecords.Remove(record);
             await _context.SaveChangesAsync();
-
             return NoContent();
         }
     }

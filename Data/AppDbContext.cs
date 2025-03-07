@@ -1,12 +1,14 @@
-using AttendanceApp.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using AttendanceApp.Models;
 
 namespace AttendanceApp.Data
 {
-    public class AppDbContext : DbContext
+    // Inherit dari IdentityDbContext agar tabel user & role Identity otomatis disertakan
+    public class AppDbContext : IdentityDbContext
     {
-        public AppDbContext(DbContextOptions<AppDbContext> options) 
-            : base(options)
+        public AppDbContext(DbContextOptions<AppDbContext> options)
+            : base(options) 
         {
         }
 

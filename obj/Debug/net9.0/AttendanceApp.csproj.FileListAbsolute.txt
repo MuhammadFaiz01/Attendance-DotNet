@@ -6,10 +6,8 @@ C:\Repositories\ResearchAndDevelopment\AttendanceApp\bin\Debug\net9.0\Attendance
 C:\Repositories\ResearchAndDevelopment\AttendanceApp\bin\Debug\net9.0\AttendanceApp.runtimeconfig.json
 C:\Repositories\ResearchAndDevelopment\AttendanceApp\bin\Debug\net9.0\AttendanceApp.dll
 C:\Repositories\ResearchAndDevelopment\AttendanceApp\bin\Debug\net9.0\AttendanceApp.pdb
-C:\Repositories\ResearchAndDevelopment\AttendanceApp\bin\Debug\net9.0\Microsoft.AspNetCore.OpenApi.dll
 C:\Repositories\ResearchAndDevelopment\AttendanceApp\bin\Debug\net9.0\Microsoft.EntityFrameworkCore.dll
 C:\Repositories\ResearchAndDevelopment\AttendanceApp\bin\Debug\net9.0\Microsoft.EntityFrameworkCore.Abstractions.dll
-C:\Repositories\ResearchAndDevelopment\AttendanceApp\bin\Debug\net9.0\Microsoft.EntityFrameworkCore.InMemory.dll
 C:\Repositories\ResearchAndDevelopment\AttendanceApp\bin\Debug\net9.0\Microsoft.OpenApi.dll
 C:\Repositories\ResearchAndDevelopment\AttendanceApp\bin\Debug\net9.0\Swashbuckle.AspNetCore.Swagger.dll
 C:\Repositories\ResearchAndDevelopment\AttendanceApp\bin\Debug\net9.0\Swashbuckle.AspNetCore.SwaggerGen.dll
@@ -37,3 +35,15 @@ C:\Repositories\ResearchAndDevelopment\AttendanceApp\obj\Debug\net9.0\refint\Att
 C:\Repositories\ResearchAndDevelopment\AttendanceApp\obj\Debug\net9.0\AttendanceApp.pdb
 C:\Repositories\ResearchAndDevelopment\AttendanceApp\obj\Debug\net9.0\AttendanceApp.genruntimeconfig.cache
 C:\Repositories\ResearchAndDevelopment\AttendanceApp\obj\Debug\net9.0\ref\AttendanceApp.dll
+C:\Repositories\ResearchAndDevelopment\AttendanceApp\obj\Debug\net9.0\AttendanceApp.sourcelink.json
+C:\Repositories\ResearchAndDevelopment\AttendanceApp\bin\Debug\net9.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+C:\Repositories\ResearchAndDevelopment\AttendanceApp\bin\Debug\net9.0\Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll
+C:\Repositories\ResearchAndDevelopment\AttendanceApp\bin\Debug\net9.0\Microsoft.EntityFrameworkCore.Relational.dll
+C:\Repositories\ResearchAndDevelopment\AttendanceApp\bin\Debug\net9.0\Microsoft.IdentityModel.JsonWebTokens.dll
+C:\Repositories\ResearchAndDevelopment\AttendanceApp\bin\Debug\net9.0\Microsoft.IdentityModel.Logging.dll
+C:\Repositories\ResearchAndDevelopment\AttendanceApp\bin\Debug\net9.0\Microsoft.IdentityModel.Protocols.dll
+C:\Repositories\ResearchAndDevelopment\AttendanceApp\bin\Debug\net9.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+C:\Repositories\ResearchAndDevelopment\AttendanceApp\bin\Debug\net9.0\Microsoft.IdentityModel.Tokens.dll
+C:\Repositories\ResearchAndDevelopment\AttendanceApp\bin\Debug\net9.0\Npgsql.dll
+C:\Repositories\ResearchAndDevelopment\AttendanceApp\bin\Debug\net9.0\Npgsql.EntityFrameworkCore.PostgreSQL.dll
+C:\Repositories\ResearchAndDevelopment\AttendanceApp\bin\Debug\net9.0\System.IdentityModel.Tokens.Jwt.dll
