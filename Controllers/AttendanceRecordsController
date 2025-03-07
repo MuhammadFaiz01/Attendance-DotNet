@@ -1,0 +1,91 @@
+using AttendanceApp.Data;
+using AttendanceApp.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+
+namespace AttendanceApp.Controllers
+{
+    [ApiController]
+    [Route("api/[controller]")]
+    public class AttendanceRecordsController : ControllerBase
+    {
+        private readonly AppDbContext _context;
+
+        public AttendanceRecordsController(AppDbContext context)
+        {
+            _context = context;
+        }
+
+        // GET: api/AttendanceRecords
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<AttendanceRecord>>> GetAttendanceRecords()
+        {
+            // Include Employee untuk melihat data karyawan 
+            return await _context.AttendanceRecords
+                                 .Include(a => a.Employee)
+                                 .ToListAsync();
+        }
+
+        // GET: api/AttendanceRecords/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<AttendanceRecord>> GetAttendanceRecord(int id)
+        {
+            var record = await _context.AttendanceRecords
+                                       .Include(a => a.Employee)
+                                       .FirstOrDefaultAsync(a => a.AttendanceRecordId == id);
+
+            if (record == null)
+            {
+                return NotFound();
+            }
+
+            return record;
+        }
+
+        // POST: api/AttendanceRecords
+        [HttpPost]
+        public async Task<ActionResult<AttendanceRecord>> CreateAttendanceRecord(AttendanceRecord attendanceRecord)
+        {
+            attendanceRecord.CheckInTime = DateTime.UtcNow; // contoh set CheckInTime otomatis
+            _context.AttendanceRecords.Add(attendanceRecord);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetAttendanceRecord), 
+                new { id = attendanceRecord.AttendanceRecordId }, 
+                attendanceRecord);
+        }
+
+        // PUT: api/AttendanceRecords/5
+        // Misalnya digunakan untuk menambahkan CheckOutTime
+        [HttpPut("{id}/checkout")]
+        public async Task<IActionResult> UpdateCheckOutTime(int id)
+        {
+            var record = await _context.AttendanceRecords.FindAsync(id);
+            if (record == null)
+            {
+                return NotFound();
+            }
+
+            record.CheckOutTime = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        // DELETE: api/AttendanceRecords/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteAttendanceRecord(int id)
+        {
+            var record = await _context.AttendanceRecords.FindAsync(id);
+            if (record == null)
+            {
+                return NotFound();
+            }
+
+            _context.AttendanceRecords.Remove(record);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+    }
+}
